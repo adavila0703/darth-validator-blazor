@@ -1,43 +1,60 @@
 ﻿@inherits LayoutComponentBase
+@using DarthValidatorBlazor.Components.PageLayoutComponents
 @using DarthValidatorBlazor.Components
+@using DarthValidatorBlazor.Enums
 
 <MudThemeProvider />
 
 <MudLayout>
     <MudAppBar Elevation="1" Color="Color.Dark">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Style="color: red" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+
+        @if (_drawerOpen == true)
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Style="color: red" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        }
+        else
+        {
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowForward" Style="color: red" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        }
         <MudSpacer />
         <AvatarComponent></AvatarComponent>
     </MudAppBar>
 
-    @*<MudDrawer @bind-Open="_drawerOpen" Elevation="2">
-            <MudDrawerHeader>
-                <MudText Typo="Typo.h5" Class="mt-1">Application</MudText>
-            </MudDrawerHeader>
+    <MudDrawer @bind-Open="_drawerOpen" Elevation="2">
+        <MudDrawerHeader>
+            <MudText Typo="Typo.h5" Class="mt-1">Darth Validator</MudText>
+        </MudDrawerHeader>
+        <div align="left">
+            <button @onclick="@(func => ChangePage(Enums.Page.Validation))">
+                <MudText Typo="Typo.h6" Class="mt-1">
+                    <MudIconButton Icon="@Icons.Material.Filled.FactCheck" Size="Size.Small" /> Validator
+                </MudText>
+            </button>
+            <br />
+            <button @onclick="@(func => ChangePage(Enums.Page.Reports))">
+                <MudText Typo="Typo.h6" Class="mt-1">
+                    <MudIconButton Icon="@Icons.Material.Filled.Report" Size="Size.Small" /> Reports
+                </MudText>
+            </button>
+            <br />
+            <button @onclick="@(func => ChangePage(Enums.Page.History))">
+                <MudText Typo="Typo.h6" Class="mt-1">
+                    <MudIconButton Icon="@Icons.Material.Filled.History" Size="Size.Small" /> History
+                </MudText>
+            </button>
+        </div>
+    </MudDrawer>
 
-        </MudDrawer>*@
-
-    <MudMainContent>
-
-        <MudPaper Height="400px" Width="100%">
-            <MudContainer MaxWidth="MaxWidth.Small">
-                <MudPaper Height="400px" Width="100%" Square="true" Class="mud-theme-primary">
-                    <FileUploadComponent></FileUploadComponent>
-                </MudPaper>
-
-            </MudContainer>
-        </MudPaper>
-
-
-
-    </MudMainContent>
-</MudLayout>
-
-@code {
-    bool _drawerOpen = true;
-
-    void DrawerToggle()
+    @if (_page == Enums.Page.Validation)
     {
-        _drawerOpen = !_drawerOpen;
+        <ValidationComponent></ValidationComponent>
     }
-}
+    else if (_page == Enums.Page.Reports)
+    {
+        <ReportsComponent></ReportsComponent>
+    }
+    else if (_page == Enums.Page.History)
+    {
+        <HistoryComponent></HistoryComponent>
+    }
+</MudLayout>

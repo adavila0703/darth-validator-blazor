@@ -1,78 +1,51 @@
-﻿@inject ISnackbar Snackbar
-<style>
-    .drag-drop-zone {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all .4s;
-        min-height: 400px;
-    }
+﻿<InputFile id="fileInput" OnChange="UploadFiles" hidden multiple />
 
-    .drag-drop-input {
-        position: absolute;
-        width: 100%;
-        height: 90%;
-        opacity: 0;
-        cursor: pointer;
-        z-index: 2;
-    }
+<MudGrid>
+    <MudItem xs="12">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
 
-    .drag-enter {
-        box-shadow: var(--mud-elevation-10);
-    }
+            <MudFab HtmlTag="label"
+                    Color="Color.Dark"
+                    Icon="@Icons.Filled.UploadFile"
+                    for="fileInput" />
+            <h3> Upload 2 csv _files to validate...</h3>
 
-    .list {
-        padding: 2em;
-        min-width: 100%;
-    }
-</style>
-
-<MudPaper @ondragenter="@(()=>_dragEnterStyle="drag-enter")"
-          @ondragleave="@(()=>_dragEnterStyle=null)"
-          @ondragend="@(()=>_dragEnterStyle=null)"
-          Class=@("drag-drop-zone "+ _dragEnterStyle)>
-
-    <InputFile OnChange="OnInputFileChanged" multiple class="drag-drop-input" />
-
-    @if (fileNames.Count() == 0)
-    {
-        <MudText Typo="Typo.h3">Drag and drop files here or click</MudText>
-    }
-    else
-    {
-        <MudList Style="padding:2em;width:100%;" Dense="true">
-            @foreach (var file in fileNames)
-            {
-                <MudListItem @key="@file">
-                    <MudChip Color="Color.Dark"
-                             Style="width:60px; overflow:hidden;"
-                             Text="@(file.Split(".").Last())" />
-                    @file
-                </MudListItem>}
-        </MudList>
-    }
-</MudPaper>
-
-<MudGrid Justify="Justify.Center" Spacing="4">
-    <MudItem>
-        <MudButton OnClick="Upload" Disabled="@(!fileNames.Any())" Color="Color.Primary" Variant="Variant.Filled">Upload</MudButton>
+        </MudPaper>
     </MudItem>
-    <MudItem>
-        <MudButton OnClick="@fileNames.Clear" Disabled="@(!fileNames.Any())" Color="Color.Error" Variant="Variant.Filled">Clear</MudButton>
+    @if (Warning)
+    {
+        <MudItem xs="12">
+            <MudAlert Severity="Severity.Error" Variant="Variant.Filled">
+                @WarningMessage <button @onclick="@ClearWarning"><MudIcon Icon="@Icons.Filled.Close" /></button>
+            </MudAlert>
+        </MudItem>
+    }
+    <MudItem xs="12">
+        <MudPaper Class="d-flex align-center justify-center mud-width-full py-8">
+            @if (_files != null)
+            {
+                <MudText Typo="@Typo.h6">
+                    @_files.Count() of 2 _files :
+                </MudText>
+                <MudList>
+                    @foreach (var file in _files)
+                    {
+                        <MudListItem Icon="@Icons.Filled.AttachFile" @key="@file">
+                            @file.Name <code>@file.Size bytes</code>
+                            <button @onclick="@(func => RemoveFile(file))"><MudIcon Icon="@Icons.Filled.DeleteForever" /></button>
+                        </MudListItem>
+                    }
+                </MudList>
+            }
+
+
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12">
+        <div align="center">
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Check" Color="Color.Dark" @onclick="@ValidateFiles">
+                Validate
+            </MudButton>
+        </div>
     </MudItem>
 </MudGrid>
-@code {
-    string _dragEnterStyle;
-    IList<string> fileNames = new List<string>();
-    void OnInputFileChanged(InputFileChangeEventArgs e)
-    {
-        var files = e.GetMultipleFiles();
-        fileNames = files.Select(f => f.Name).ToList();
-    }
-    void Upload()
-    {
-        //Upload the files here
-        Snackbar.Configuration.PositionClass = Defaults.Classes.Position.TopCenter;
-        Snackbar.Add("TODO: Upload your files!", Severity.Normal);
-    }
-}

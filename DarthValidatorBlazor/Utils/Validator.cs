@@ -56,13 +56,14 @@ namespace DarthValidatorBlazor.Utils
 
         // TODO: Set up main entry function to start the validator here
 
-        //static void ToCall()
-        //{
-        //    var workBookOne = File.ReadLines("../../../../example1.csv", Encoding.GetEncoding(codepage: 65001));
-        //    var workBookTwo = File.ReadLines("../../../../example2.csv", Encoding.GetEncoding(codepage: 65001));
-        //    var hashSetOne = AddToHashSet(workBookOne);
-        //    var hashSetTwo = AddToHashSet(workBookTwo);
-        //    Console.WriteLine(CreateReport(SearchSets(hashSetOne, hashSetTwo), SearchSets(hashSetTwo, hashSetOne)));
-        //}
+        static void ToCall()
+        {
+            var workBookOne = File.ReadLines("../../../../example1.csv", Encoding.GetEncoding(codepage: 65001));
+            var workBookTwo = File.ReadLines("../../../../example2.csv", Encoding.GetEncoding(codepage: 65001));
+
+            var hashSetOne = AddToHashSet(workBookOne);
+            var hashSetTwo = AddToHashSet(workBookTwo);
+            Console.WriteLine(CreateReport(SearchSets(hashSetOne, hashSetTwo), SearchSets(hashSetTwo, hashSetOne)));
+        }
     }
 }
