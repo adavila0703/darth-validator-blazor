@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Components.Forms;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace DarthValidatorBlazor.Utils
 {
@@ -13,25 +15,16 @@ namespace DarthValidatorBlazor.Utils
             //TODO: add csv export
         }
 
-        public static HashSet<string> AddToHashSet(IEnumerable<string> file)
-        {
-            var hashSet = new HashSet<string>();
-            foreach (var row in file)
-            {
-                hashSet.Add(row);
-            }
-            return hashSet;
-        }
 
-        public static string[] SearchSets(HashSet<string> setOne, HashSet<string> setTwo)
+        public static string[] Validation(List<string> listOne, List<string> listTwo)
         {
-            int rowCount = setOne.Count > setTwo.Count ? setOne.Count : setTwo.Count;
-            int columnCount = setOne.ElementAt(0).Split(",").Length;
+            int rowCount = listTwo.Count;
+            int columnCount = listOne.ElementAt(0).Split(",").Length;
             float numOfMatching = new int();
 
             for (int i = 0; i < rowCount; i++)
             {
-                if (setOne.Contains(setTwo.ElementAt(i)))
+                if (listOne.Contains(listTwo.ElementAt(i)))
                 {
                     numOfMatching++;
                 }
@@ -52,18 +45,6 @@ namespace DarthValidatorBlazor.Utils
         public static string CreateReport(string[] reportOne, string[] reportTwo)
         {
             return $"{ReportRows("Report1", reportOne, reportTwo)} {ReportRows("Report2", reportOne, reportTwo)}";
-        }
-
-        // TODO: Set up main entry function to start the validator here
-
-        static void ToCall()
-        {
-            var workBookOne = File.ReadLines("../../../../example1.csv", Encoding.GetEncoding(codepage: 65001));
-            var workBookTwo = File.ReadLines("../../../../example2.csv", Encoding.GetEncoding(codepage: 65001));
-
-            var hashSetOne = AddToHashSet(workBookOne);
-            var hashSetTwo = AddToHashSet(workBookTwo);
-            Console.WriteLine(CreateReport(SearchSets(hashSetOne, hashSetTwo), SearchSets(hashSetTwo, hashSetOne)));
         }
     }
 }
