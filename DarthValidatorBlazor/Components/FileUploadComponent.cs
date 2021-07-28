@@ -7,27 +7,36 @@ using System.Text;
 using System.Threading.Tasks;
 using DarthValidatorBlazor.Utils;
 using System.Threading;
+using static System.Net.WebRequestMethods;
+using System.Security.Permissions;
 
 namespace DarthValidatorBlazor.Components
 {
     public partial class FileUploadComponent
     {
         private IList<IBrowserFile> _files = new List<IBrowserFile>();
+        private List<List<string>> validationContent = new List<List<string>>();
+        private string[] validationResult = new string[4];
         private bool Warning = false;
         private string WarningMessage;
-        private void UploadFiles(InputFileChangeEventArgs inputFileChangeEventArgs)
+
+
+        public void UploadFiles(InputFileChangeEventArgs inputFileChangeEventArgs)
         {
             foreach (var file in inputFileChangeEventArgs.GetMultipleFiles())
             {
                 if (AcceptableFile(file))
                     _files.Add(file);
+                    FileToList(file);
             }
-            //TODO upload the files to the server
         }
 
         public void RemoveFile(IBrowserFile file)
         {
+            var itemIndex = _files.IndexOf(file);
             _files.Remove(file);
+            validationContent.RemoveAt(itemIndex);
+            Console.WriteLine(validationContent.Count);
         }
 
         public void ClearWarning()
@@ -53,32 +62,33 @@ namespace DarthValidatorBlazor.Components
             }
             return true;
         }
-
-        public async static IAsyncEnumerable<string> ParseIncomingStream(IBrowserFile file)
+        public bool ValidationIsValid()
         {
-            using (var stream = new StreamReader(file.OpenReadStream()))
+            if(_files.Count == 2)
             {
-                yield return await stream.ReadToEndAsync();
-                stream.Close();
+                return true;
+            }
+            else
+            {
+                Warning = true;
+                WarningMessage = "You do not have enought files to validate";
+                return false;
             }
         }
 
-        public static async Task<List<string>> StreamToList(IBrowserFile file)
+        public void ValidateFiles()
         {
-            List<string> newList = new List<string>();
-            await foreach (var line in ParseIncomingStream(file))
+
+            if (ValidationIsValid())
             {
-                newList.Add(line);
+                validationResult = Validator.Validation(validationContent[0], validationContent[1]);
             }
-            return newList;
         }
 
-        public async void ValidateFiles()
+        public async void FileToList(IBrowserFile file)
         {
-            //TODO: Fix error
-            var listOne = await StreamToList(_files[0]);
-            var listTwo = await StreamToList(_files[1]);
-            var validation = Validator.Validation(listOne, listTwo);
+            var incomingString = (await new StreamReader(file.OpenReadStream()).ReadToEndAsync()).Split('\n');
+            validationContent.Add(incomingString.ToList());
         }
     }
 }
